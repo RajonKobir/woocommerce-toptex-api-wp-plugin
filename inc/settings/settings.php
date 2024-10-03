@@ -802,19 +802,6 @@ function woocommerce_toptex_api_import_template_callback() {
     $attributes = json_decode($attributes, true);
     ?>
 
-    <style>
-        .toptex_clickable_catalog{
-            cursor: pointer;
-        }
-        .toptex_catalog{
-            margin-right: 10px;
-            display: inline-block;
-        }
-        .toptex_catalog:last-child{
-            margin-right: 0;
-        }
-    </style>
-
     <div class="wrap">
         <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
         <div class="row mt-3">
@@ -926,6 +913,7 @@ function woocommerce_toptex_api_import_template_callback() {
     <?php
 
 }
+// Submenu page 2 ends here
 
 
 
@@ -1006,3 +994,4 @@ if( $toptex_cron_list != '' && count($toptex_cron_list) > 0 ){
 }
 
 }
+// Submenu page 3 ends here

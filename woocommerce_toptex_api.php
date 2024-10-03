@@ -16,10 +16,37 @@
 if( !defined('ABSPATH') ) : exit(); endif;
 
 
+// if no woocommerce return from here
+if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ){
+    add_action( 'admin_notices', 'woocommerce_toptex_api_admin_warning');
+    function woocommerce_toptex_api_admin_warning(){
+        echo '<div class="notice notice-warning is-dismissible">
+            <p>Please Install & Activate WooCommerce Plugin To Deal With woocommerce_toptex_api Plugin</p>
+        </div>';
+    }
+    return;
+}
+
+
 // Define plugin constants 
 define( 'WOOCOMMERCE_TOPTEX_API_PLUGIN_PATH', trailingslashit( plugin_dir_path(__FILE__) ) );
 define( 'WOOCOMMERCE_TOPTEX_API_PLUGIN_URL', trailingslashit( plugins_url('/', __FILE__) ) );
 define( 'WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME', 'woocommerce_toptex_api' );
+
+
+// adding settings link into plugin list page
+if( is_admin() ) {
+    add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'toptex_settings_link' );
+    function toptex_settings_link( array $links ) {
+        $settings_url = get_admin_url() . "admin.php?page=woocommerce_toptex_api_settings_page";
+        $settings_link = '<a href="' . $settings_url . '" aria-label="' . __('View Toptex Settings', WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME ) . ' ">' . __('Settings', WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME ) . '</a>';
+		$action_links = array(
+			'settings' => $settings_link,
+		);
+		return array_merge( $action_links, $links );
+    }
+}
+// adding settings link into plugin list page ends here
 
 
 // clearing unexpected characters
@@ -27,9 +54,10 @@ function toptex_secure_input($data) {
     $data = strval($data);
     $data = strtolower($data);
     $data = trim($data);
+    $data = preg_replace('/\s+/', ' ', $data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
-    $special_characters = ['&amp;', '&#38;', '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;', '&bdquo;', '&quot;', '&plus;', '&#43;', '&#x2B;', '&#8722;', '&#x2212;', '&minus;', '&ndash;', '&mdash;', '&reg;', '&#174;', '&sol;', '&#47;', '&bsol;', '&#92;', '&copy;', '&#169;' ];
+    $special_characters = ['&amp;', '&#38;', '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;', '&bdquo;', '&quot;', '&plus;', '&#43;', '&#x2B;', '&#8722;', '&#x2212;', '&minus;', '&ndash;', '&mdash;', '&reg;', '&#174;', '&sol;', '&#47;', '&bsol;', '&#92;', '&copy;', '&#169;', '&equals;', '&#x3D;', '&#61;', '^', '&', '=' ];
     foreach($special_characters as $key => $single_character){
         $data = str_replace($single_character, '&', $data);
     }
@@ -193,13 +221,12 @@ function toptex_order( $order_id ) {
             $billing_state      = $order->get_billing_state();
             $billing_postcode   = $order->get_billing_postcode();
             $billing_country    = $order->get_billing_country();
-            $customer_id = $order->get_customer_id();
 
             $billing_full_name = $billing_first_name . ' ' . $billing_last_name;
             $billing_address = $billing_address_1 . ', ' . $billing_address_2;
 
             // for putting on toptex order api
-            $Reference = parse_url(site_url(), PHP_URL_HOST) . ' - ' . $order_id . ' - ' . $billing_first_name . ' - ' . $customer_id;
+            $Reference = parse_url(site_url(), PHP_URL_HOST) . ' - ' . $order_id . ' - ' . $billing_first_name;
 
 			// assigning values got from wp options
 			$toptex_api_base_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url');

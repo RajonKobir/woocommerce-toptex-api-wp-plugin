@@ -17,6 +17,9 @@ $toptex_username = '';
 $toptex_password = '';
 $toptex_api_key = '';
 $toptex_api_language = '';
+
+$variant_price = 0;
+
 $resultHTML = '';
 
 // get option value
@@ -52,15 +55,33 @@ if( $toptex_cron_list ){
             if( $toptex_sku_next_to_update != ''){
 
             // assigning values got from wp options
-            $website_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_website_url');
-            $woocommerce_api_consumer_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_key');
-            $woocommerce_api_consumer_secret = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_secret');
-            $woocommerce_api_mul_val = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_mul_val');
-            $toptex_api_base_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url');
-            $toptex_username = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_username');
-            $toptex_password = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_password');
-            $toptex_api_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_key');
-            $toptex_api_language = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_language');
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_website_url')){
+              $website_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_website_url');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_key')){
+              $woocommerce_api_consumer_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_key');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_secret')){
+              $woocommerce_api_consumer_secret = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_secret');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_mul_val')){
+              $woocommerce_api_mul_val = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_mul_val');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url')){
+              $toptex_api_base_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_username')){
+              $toptex_username = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_username');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_password')){
+              $toptex_password = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_password');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_key')){
+              $toptex_api_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_key');
+            }
+            if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_language')){
+              $toptex_api_language = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_language');
+            }
 
             // WC Rest API SDK instantiating
             $woocommerce = new Client(
@@ -866,31 +887,38 @@ if( $toptex_cron_list ){
                         $toptex_api_stock_quantity = 0;
 
                         if(isset($toptex_api_variant_stock)){
+                          if($toptex_api_variant_stock != ''){
                             $toptex_api_variant_stock = json_decode($toptex_api_variant_stock, true);
                             if(is_array($toptex_api_variant_stock)){
-                            if(count($toptex_api_variant_stock) != 0){
+                              if(count($toptex_api_variant_stock) != 0){
                                 foreach($toptex_api_variant_stock as $stock_key => $single_stock){
-                                if(is_array($single_stock["warehouses"])){
-                                    if(count($single_stock["warehouses"]) != 0){
-                                    foreach($single_stock["warehouses"] as $warehouse_key => $single_warehouse){
-                                        if(isset($single_warehouse["stock"])){
-                                        if(is_int($single_warehouse["stock"])){
-                                            $toptex_api_stock_quantity += $single_warehouse["stock"];
+                                  if(isset($single_stock["warehouses"])){
+                                    if(is_array($single_stock["warehouses"])){
+                                      if(count($single_stock["warehouses"]) != 0){
+                                        foreach($single_stock["warehouses"] as $warehouse_key => $single_warehouse){
+                                          if(isset($single_warehouse["stock"])){
+                                            if(is_int($single_warehouse["stock"])){
+                                              $toptex_api_stock_quantity += $single_warehouse["stock"];
+                                            }
+                                          }
                                         }
-                                        }
+                                      }
                                     }
-                                    }
+                                  }
                                 }
-                                }
+                              }
                             }
-                            }
+                          }
                         }
 
                         }
                         // try-catch ends here
 
                         // variant price
-                        $variant_price = strval(round((floatval($woocommerce_api_mul_val) * floatval($single_size["prices"][0]["price"])), 2));
+                        if(isset($single_size["prices"][0]["price"])){
+                          $variant_price = round((floatval($woocommerce_api_mul_val) * floatval($single_size["prices"][0]["price"])), 2);
+                        }
+
 
                         $variation_meta_data = [
                           [
@@ -899,7 +927,7 @@ if( $toptex_cron_list ){
                           ],
                           [
                               'key' => 'price',
-                              'value' => $variant_price,
+                              'value' => strval($variant_price),
                           ],
                           [
                               'key' => 'description',
@@ -977,7 +1005,7 @@ if( $toptex_cron_list ){
                         
                         // creating variation data
                         $data = [
-                          'regular_price' => $variant_price,
+                          'regular_price' => strval($variant_price),
                           'description' => $single_variant_name,
                           'sku' => strval($toptex_api_variant_sku),
                           'image' => [

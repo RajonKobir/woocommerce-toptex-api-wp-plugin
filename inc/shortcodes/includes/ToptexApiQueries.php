@@ -268,61 +268,50 @@ class ToptexApiQueries
     }
 
 
-        // creating a request to OpenAI
-        public function open_ai_request_response( $open_ai_api_key, $open_ai_model, $open_ai_prompt, $open_ai_temperature, $open_ai_max_tokens, $open_ai_frequency_penalty, $open_ai_presence_penalty ){
+    // creating a request to OpenAI
+    public function open_ai_request_response( $open_ai_api_key, $open_ai_model, $open_ai_prompt, $open_ai_temperature, $open_ai_max_tokens, $open_ai_frequency_penalty, $open_ai_presence_penalty ){
 
-          $result = '';
-    
-          if(!$open_ai_model || $open_ai_model == ''){
-            $open_ai_model = 'text-davinci-003';
-          }
-          if(!$open_ai_temperature || $open_ai_temperature == ''){
-            $open_ai_temperature = 0.9;
-          }
-          if(!$open_ai_max_tokens || $open_ai_max_tokens == ''){
-            $open_ai_max_tokens = 500;
-          }
-          if(!$open_ai_frequency_penalty || $open_ai_frequency_penalty == ''){
-            $open_ai_frequency_penalty = 0;
-          }
-          if(!$open_ai_presence_penalty || $open_ai_presence_penalty == ''){
-            $open_ai_presence_penalty = 0.6;
-          }
-    
-          try {
-    
-            $open_ai = new OpenAi($open_ai_api_key);
-    
-            $response = $open_ai->completion([
-                'model' => $open_ai_model,
-                'prompt' => $open_ai_prompt,
-                'temperature' => $open_ai_temperature,
-                'max_tokens' => $open_ai_max_tokens,
-                'frequency_penalty' => $open_ai_frequency_penalty,
-                'presence_penalty' => $open_ai_presence_penalty,
-            ]);
-    
-        } catch (PDOException $e) {
-    
-            $response = "Error: " . $e->getMessage();
-    
-        }finally{
-    
-          $response = json_decode($response, true);
-    
-          // if no error
-          if(!isset($response['error'])){
-            if(isset($response["choices"][0]["text"])){
-              $result = $response["choices"][0]["text"];
-            }
-          }
-    
-        }
-    
-          return $result;
-    
-        }
-        // end of public function open_ai_request_response 
+      $result = '';
+
+      if(!$open_ai_model || $open_ai_model == ''){
+        $open_ai_model = 'text-davinci-003';
+      }
+      if(!$open_ai_temperature || $open_ai_temperature == ''){
+        $open_ai_temperature = 0.9;
+      }
+      if(!$open_ai_max_tokens || $open_ai_max_tokens == ''){
+        $open_ai_max_tokens = 500;
+      }
+      if(!$open_ai_frequency_penalty || $open_ai_frequency_penalty == ''){
+        $open_ai_frequency_penalty = 0;
+      }
+      if(!$open_ai_presence_penalty || $open_ai_presence_penalty == ''){
+        $open_ai_presence_penalty = 0.6;
+      }
+
+      try {
+
+        $open_ai = new OpenAi($open_ai_api_key);
+
+        $result = $open_ai->completion([
+            'model' => $open_ai_model,
+            'prompt' => $open_ai_prompt,
+            'temperature' => $open_ai_temperature,
+            'max_tokens' => $open_ai_max_tokens,
+            'frequency_penalty' => $open_ai_frequency_penalty,
+            'presence_penalty' => $open_ai_presence_penalty,
+        ]);
+
+      } catch (PDOException $e) {
+
+          $result = "Error: " . $e->getMessage();
+
+      }
+
+      return $result;
+
+    }
+    // end of public function open_ai_request_response 
 
 
 

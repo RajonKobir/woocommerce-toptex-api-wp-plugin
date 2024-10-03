@@ -29,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $toptex_api_key = '';
     $toptex_api_language = '';
     $wc_prod_tags = '';
+
     $open_ai_api_key = '';
     $open_ai_model = '';
     $open_ai_temperature = '';
@@ -38,32 +39,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $custom_tags_on_off = '';
     $open_ai_on_off = '';
 
+    $variant_price = 0;
+
     $resultHTML = '';
 
     // assigning values got from wp options
-    $website_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_website_url');
-    $woocommerce_api_consumer_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_key');
-    $woocommerce_api_consumer_secret = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_secret');
-    $woocommerce_api_mul_val = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_mul_val');
-    $toptex_api_base_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url');
-    $toptex_username = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_username');
-    $toptex_password = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_password');
-    $toptex_api_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_key');
-    $toptex_api_language = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_language');
-    $wc_prod_tags = toptex_secure_input(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_wc_prod_tags'));
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_website_url')){
+      $website_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_website_url');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_key')){
+      $woocommerce_api_consumer_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_key');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_secret')){
+      $woocommerce_api_consumer_secret = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_consumer_secret');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_mul_val')){
+      $woocommerce_api_mul_val = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_woocommerce_api_mul_val');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url')){
+      $toptex_api_base_url = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_base_url');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_username')){
+      $toptex_username = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_username');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_password')){
+      $toptex_password = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_password');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_key')){
+      $toptex_api_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_key');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_language')){
+      $toptex_api_language = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_toptex_api_language');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_wc_prod_tags')){
+      $wc_prod_tags = toptex_secure_input(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_wc_prod_tags'));
+    }
 
 
     // open ai option values
-    $open_ai_api_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_api_key');
-    $open_ai_model = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_model');
-    $open_ai_temperature = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_temperature');
-    $open_ai_max_tokens = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_max_tokens');
-    $open_ai_frequency_penalty = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_frequency_penalty');
-    $open_ai_presence_penalty = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_presence_penalty');
-
-    $custom_tags_on_off = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_custom_tags_on_off');
-    $open_ai_on_off = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_on_off');
-
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_api_key')){
+      $open_ai_api_key = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_api_key');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_model')){
+      $open_ai_model = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_model');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_temperature')){
+      $open_ai_temperature = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_temperature');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_max_tokens')){
+      $open_ai_max_tokens = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_max_tokens');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_frequency_penalty')){
+      $open_ai_frequency_penalty = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_frequency_penalty');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_presence_penalty')){
+      $open_ai_presence_penalty = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_presence_penalty');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_custom_tags_on_off')){
+      $custom_tags_on_off = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_custom_tags_on_off');
+    }
+    if(get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_on_off')){
+      $open_ai_on_off = get_option( WOOCOMMERCE_TOPTEX_API_PLUGIN_NAME . '_open_ai_on_off');
+    }
+    
 
     // assigning language
     $language_full_name = "";
@@ -109,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
 
-      // sending single product API request to Toptex
+      // sending token request to Toptex
       $toptex_api_get_token = $ApiQuery->toptex_api_get_token($toptex_api_base_url, $toptex_username, $toptex_password, $toptex_api_key);
 
       } catch (PDOException $e) {
@@ -304,13 +342,22 @@ if($open_ai_api_key && $open_ai_api_key != ''){
       // sending request to openAI
       $open_ai_request_response = $ApiQuery->open_ai_request_response( $open_ai_api_key, $open_ai_model, $open_ai_prompt, $open_ai_temperature, $open_ai_max_tokens, $open_ai_frequency_penalty, $open_ai_presence_penalty );
     } catch (PDOException $e) {
+      
       $resultHTML .= "Error: " . $e->getMessage();
+
     }finally{
-      if($open_ai_request_response != ''){
-        $toptex_prod_desc = str_replace('"', '', $open_ai_request_response);
-        $resultHTML .= '<p class="text-center">OpenAI API has updated the product description...</p>';
-      }else{
+      $open_ai_request_response = json_decode($open_ai_request_response, true);
+      if(isset($open_ai_request_response['error'])){
         $resultHTML .= '<p class="text-center">OpenAI API could not update the product description...</p>';
+        $resultHTML .= '<p class="text-center">OpenAI API Error: '.$open_ai_request_response['error']["type"].' - '.$open_ai_request_response['error']["message"].'</p>';
+      }else{
+        if(isset($open_ai_request_response["choices"][0]["text"])){
+          $resultText = $open_ai_request_response["choices"][0]["text"];
+          $toptex_prod_desc = str_replace('"', '', $resultText);
+          $resultHTML .= '<p class="text-center">OpenAI API has updated the product description...</p>';
+        }else{
+          $resultHTML .= '<p class="text-center">Unknown OpenAI API Error occured on updating the product description. Please contact the developer.</p>';
+        }
       }
     }
 
@@ -320,13 +367,22 @@ if($open_ai_api_key && $open_ai_api_key != ''){
       // sending request to openAI
       $open_ai_request_response = $ApiQuery->open_ai_request_response( $open_ai_api_key, $open_ai_model, $open_ai_prompt, $open_ai_temperature, $open_ai_max_tokens, $open_ai_frequency_penalty, $open_ai_presence_penalty );
     } catch (PDOException $e) {
+
       $resultHTML .= "Error: " . $e->getMessage();
+
     }finally{
-      if($open_ai_request_response != ''){
-        $toptex_prod_short_desc = str_replace('"', '', $open_ai_request_response);
-        $resultHTML .= '<p class="text-center">OpenAI API has updated the product short-description...</p>';
-      }else{
+      $open_ai_request_response = json_decode($open_ai_request_response, true);
+      if(isset($open_ai_request_response['error'])){
         $resultHTML .= '<p class="text-center">OpenAI API could not update the product short-description...</p>';
+        $resultHTML .= '<p class="text-center">OpenAI API Error: '.$open_ai_request_response['error']["type"].' - '.$open_ai_request_response['error']["message"].'</p>';
+      }else{
+        if(isset($open_ai_request_response["choices"][0]["text"])){
+          $resultText = $open_ai_request_response["choices"][0]["text"];
+          $toptex_prod_short_desc = str_replace('"', '', $resultText);
+          $resultHTML .= '<p class="text-center">OpenAI API has updated the product short-description...</p>';
+        }else{
+          $resultHTML .= '<p class="text-center">Unknown OpenAI API Error occured on updating the product short-description. Please contact the developer.</p>';
+        }
       }
     }
 
@@ -337,13 +393,22 @@ if($open_ai_api_key && $open_ai_api_key != ''){
         // sending request to openAI
         $open_ai_request_response = $ApiQuery->open_ai_request_response( $open_ai_api_key, $open_ai_model, $open_ai_prompt, $open_ai_temperature, $open_ai_max_tokens, $open_ai_frequency_penalty, $open_ai_presence_penalty );
       } catch (PDOException $e) {
+
         $resultHTML .= "Error: " . $e->getMessage();
+
       }finally{
-        if($open_ai_request_response != ''){
-          $wc_prod_tags = toptex_secure_input($open_ai_request_response);
-          $resultHTML .= '<p class="text-center">OpenAI API has updated the product tags...</p>';
-        }else{
+        $open_ai_request_response = json_decode($open_ai_request_response, true);
+        if(isset($open_ai_request_response['error'])){
           $resultHTML .= '<p class="text-center">OpenAI API could not update the product tags...</p>';
+          $resultHTML .= '<p class="text-center">OpenAI API Error: '.$open_ai_request_response['error']["type"].' - '.$open_ai_request_response['error']["message"].'</p>';
+        }else{
+          if(isset($open_ai_request_response["choices"][0]["text"])){
+            $resultText = $open_ai_request_response["choices"][0]["text"];
+            $wc_prod_tags = toptex_secure_input($resultText);
+            $resultHTML .= '<p class="text-center">OpenAI API has updated the product tags...</p>';
+          }else{
+            $resultHTML .= '<p class="text-center">Unknown OpenAI API Error occured on updating the product tags. Please contact the developer.</p>';
+          }
         }
       }
     }
@@ -906,7 +971,9 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                   try {
                     $image_id = woocommerce_toptex_api_custom_image_file_upload( $toptex_all_image_src_array[$i]['src'], $toptex_all_image_src_array[$i]['name'] );
                   }catch (PDOException $e) {
+
                     $resultHTML .= "Error: " . $e->getMessage();
+
                   }finally{
                     if(is_int($image_id)){
                       array_push($updated_images_array,  [
@@ -953,9 +1020,58 @@ if($open_ai_api_key && $open_ai_api_key != ''){
 
               }finally{
 
+                // get the correct product id
+                $wc_product_id = $update_wc_prod->id;
+
                 $wc_retrieved_product = $update_wc_prod;
 
-                $resultHTML .= '<p class="text-center">Product ('.$toptex_prod_name.') updated successfully!</p>';
+                //create or update wp-option includes list of product sku for cron 
+                $product_id = $update_wc_prod->id;
+                $product_sku = $update_wc_prod->sku;
+
+                if( $product_id != '' && $product_sku != ''){
+
+                  $resultHTML .= '<p class="text-center">Product ('.$product_id.') => ('.$product_sku.') => ('.$toptex_prod_name.') Updated successfully!</p>';
+
+                  $toptex_cron_list = get_option('toptex_cron_list');
+
+                  if ( !in_array($product_sku, $toptex_cron_list) ){
+
+                    $toptex_cron_list[$product_id] = $product_sku;
+
+                    update_option('toptex_cron_list', $toptex_cron_list);
+    
+                    $resultHTML .= '<p class="text-center">Product '.$product_id.' => '.$product_sku.' => ('.$toptex_prod_name.') has been inserted to the cron list successfully!</p>';
+
+                  }
+
+                  $toptex_products_sku_list = get_option('toptex_products_sku_list');
+
+                  if ( !in_array($product_sku, $toptex_products_sku_list) ){
+
+                    $toptex_products_sku_list[$product_id] = $product_sku;
+
+                    update_option('toptex_products_sku_list', $toptex_products_sku_list);
+    
+                    $resultHTML .= '<p class="text-center">Product '.$product_id.' => '.$product_sku.' => ('.$toptex_prod_name.') has been inserted to the all toptex products list successfully!</p>';
+
+                  }
+
+                  $toptex_sku_next_to_update = get_option('toptex_sku_next_to_update');
+
+                  if($toptex_sku_next_to_update == ''){
+
+                    update_option('toptex_sku_next_to_update', $product_sku );
+
+                    $resultHTML .= '<p class="text-center">Next to update option was empty</p>';
+                    $resultHTML .= '<p class="text-center">Product '.$product_id.' => '.$product_sku.' => ('.$toptex_prod_name.') has been inserted to the next to update cron successfully!</p>';
+
+                  }
+
+                }else{
+                  $resultHTML .= '<p class="text-center">Product ('.$toptex_prod_name.') could not be imported!</p>';
+                }
+                //create or update wp-option includes list of product sku for cron ends here
 
               }
 
@@ -970,7 +1086,9 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                 try {
                   $image_id = woocommerce_toptex_api_custom_image_file_upload( $single_toptex_image['src'], $single_toptex_image['name'] );
                 }catch (PDOException $e) {
+
                   $resultHTML .= "Error: " . $e->getMessage();
+
                 }finally{
                   if(is_int($image_id)){
                     array_push($updated_images_array,  [
@@ -1037,7 +1155,7 @@ if($open_ai_api_key && $open_ai_api_key != ''){
 
                     update_option('toptex_cron_list', $toptex_cron_list);
     
-                    $resultHTML .= '<p class="text-center">Product ('.$product_id.') => ('.$product_sku.') => ('.$toptex_prod_name.') has been inserted to the cron list successfully!</p>';
+                    $resultHTML .= '<p class="text-center">Product '.$product_id.' => '.$product_sku.' => ('.$toptex_prod_name.') has been inserted to the cron list successfully!</p>';
 
                   }
 
@@ -1049,7 +1167,7 @@ if($open_ai_api_key && $open_ai_api_key != ''){
 
                     update_option('toptex_products_sku_list', $toptex_products_sku_list);
     
-                    $resultHTML .= '<p class="text-center">Product ('.$product_id.') => ('.$product_sku.') => ('.$toptex_prod_name.') has been inserted to the all toptex products list successfully!</p>';
+                    $resultHTML .= '<p class="text-center">Product '.$product_id.' => '.$product_sku.' => ('.$toptex_prod_name.') has been inserted to the all toptex products list successfully!</p>';
 
                   }
 
@@ -1194,16 +1312,20 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                           $toptex_api_stock_quantity = 0;
 
                           if(isset($toptex_api_variant_stock)){
-                            $toptex_api_variant_stock = json_decode($toptex_api_variant_stock, true);
-                            if(is_array($toptex_api_variant_stock)){
-                              if(count($toptex_api_variant_stock) != 0){
-                                foreach($toptex_api_variant_stock as $stock_key => $single_stock){
-                                  if(is_array($single_stock["warehouses"])){
-                                    if(count($single_stock["warehouses"]) != 0){
-                                      foreach($single_stock["warehouses"] as $warehouse_key => $single_warehouse){
-                                        if(isset($single_warehouse["stock"])){
-                                          if(is_int($single_warehouse["stock"])){
-                                            $toptex_api_stock_quantity += $single_warehouse["stock"];
+                            if($toptex_api_variant_stock != ''){
+                              $toptex_api_variant_stock = json_decode($toptex_api_variant_stock, true);
+                              if(is_array($toptex_api_variant_stock)){
+                                if(count($toptex_api_variant_stock) != 0){
+                                  foreach($toptex_api_variant_stock as $stock_key => $single_stock){
+                                    if(isset($single_stock["warehouses"])){
+                                      if(is_array($single_stock["warehouses"])){
+                                        if(count($single_stock["warehouses"]) != 0){
+                                          foreach($single_stock["warehouses"] as $warehouse_key => $single_warehouse){
+                                            if(isset($single_warehouse["stock"])){
+                                              if(is_int($single_warehouse["stock"])){
+                                                $toptex_api_stock_quantity += $single_warehouse["stock"];
+                                              }
+                                            }
                                           }
                                         }
                                       }
@@ -1217,8 +1339,12 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                         }
                         // try-catch ends here
 
+
                         // variant price
-                        $variant_price = strval(round((floatval($woocommerce_api_mul_val) * floatval($single_size["prices"][0]["price"])), 2));
+                        if(isset($single_size["prices"][0]["price"])){
+                          $variant_price = round((floatval($woocommerce_api_mul_val) * floatval($single_size["prices"][0]["price"])), 2);
+                        }
+
 
                         $variation_meta_data = [
                           [
@@ -1227,7 +1353,7 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                           ],
                           [
                               'key' => 'price',
-                              'value' => $variant_price,
+                              'value' => strval($variant_price),
                           ],
                           [
                               'key' => 'description',
@@ -1306,7 +1432,7 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                         
                         // creating variation data
                         $data = [
-                          'regular_price' => $variant_price,
+                          'regular_price' => strval($variant_price),
                           'description' => $single_variant_name,
                           'sku' => strval($toptex_api_variant_sku),
                           'image' => [
@@ -1447,9 +1573,13 @@ if($open_ai_api_key && $open_ai_api_key != ''){
       // sending single product API request to Toptex
       $toptex_api_all_catalog_references = $ApiQuery->toptex_api_all_catalog_references($toptex_api_base_url, $family, $subfamily, $brand, $toptex_api_key, $toptex_api_token);
       } catch (PDOException $e) {
+
         $resultHTML .= "Error: " . $e->getMessage();
+
       }finally{
+
         $toptex_api_all_catalog_references = json_decode($toptex_api_all_catalog_references, true);
+
       }
       // if a valid response
       if(isset($toptex_api_all_catalog_references["items"])){
@@ -1467,6 +1597,18 @@ if($open_ai_api_key && $open_ai_api_key != ''){
         $toptex_products_sku_list = get_option('toptex_products_sku_list');
         if(count($all_products_references) > 0){
           $resultHTML .= '<p class="text-center">Click any items below to import: (Green ones are already imported!)</p>';
+          $resultHTML .= '<style>
+              .toptex_clickable_catalog{
+                  cursor: pointer;
+              }
+              .toptex_catalog{
+                  margin-right: 10px;
+                  display: inline-block;
+              }
+              .toptex_catalog:last-child{
+                  margin-right: 0;
+              }
+          </style>';
           foreach( $all_products_references as $reference_key => $single_catalog_reference ){
             if (in_array($single_catalog_reference, $toptex_products_sku_list)){
               $resultHTML .= '<span class="text-success toptex_catalog">'.$single_catalog_reference.'</span>';
@@ -1475,11 +1617,60 @@ if($open_ai_api_key && $open_ai_api_key != ''){
             }
             
           }
+
+          // import all button 
+          $resultHTML .= '<br><br>';
+          $resultHTML .= '<button type="submit" id="woocommerce_toptex_api_import_all_button" class="woocommerce_toptex_api_import_all_button btn btn-warning mb-3" name="woocommerce_toptex_api_import_all_button">Import All</button>';
   
           $resultHTML .= '
           <script>
+
             $(".toptex_clickable_catalog").click(function(){
               $("#woocommerce_toptex_api_catalog_reference_field").val($(this).html());
+            });
+
+            $(".woocommerce_toptex_api_import_all_button").click(async function(event){
+              event.preventDefault();
+              let all_products_references = '.json_encode($all_products_references).';
+              let toptex_api_catalog_reference;
+              let post_url = "' . WOOCOMMERCE_TOPTEX_API_PLUGIN_URL . 'inc/shortcodes/includes/post.php";
+              let current_url = $(location).attr("href");
+              let toptex_submit_reference_result_button_text = $("#toptex_submit_reference_result").html();
+              let woocommerce_toptex_api_submit_button_text = $("#woocommerce_toptex_api_submit_button").html();
+              $("#toptex_submit_reference_result").attr("disabled", true);
+              $("#toptex_submit_reference_result").html("Importing...");
+              $("#woocommerce_toptex_api_submit_button").attr("disabled", true);
+              $("#woocommerce_toptex_api_submit_button").html("Importing...");
+              $("#result").html("<h6>Please do not refresh or close this window while importing...</h6>");
+              $("#result h6").addClass("text-center text-danger");
+              
+              for (let index = 0; index < all_products_references.length; index++) {
+                toptex_api_catalog_reference = all_products_references[index];
+                await $.ajax({
+                    type: "POST",
+                    url: post_url,
+                    data: {toptex_api_catalog_reference, current_url}, 
+                    success: function(result){
+                        $("#result").html(result);
+                        if(index < all_products_references.length){
+                          $("#toptex_submit_reference_result").attr("disabled", true);
+                          $("#toptex_submit_reference_result").html("Importing...");
+                          $("#woocommerce_toptex_api_submit_button").attr("disabled", true);
+                          $("#woocommerce_toptex_api_submit_button").html("Importing...");
+                          $("#result").prepend("<h6>Please do not refresh or close this window while importing...</h6>");
+                          $("#result h6").addClass("text-center text-danger");
+                        }
+                    }
+                });
+              }
+
+              $("#result").prepend("<h6>All The Selected "+all_products_references.length+" Products Have Been Successfully Imported!</h6>");
+              $("#result h6").addClass("text-center text-success");
+              $("#toptex_submit_reference_result").attr("disabled", false);
+              $("#toptex_submit_reference_result").html(toptex_submit_reference_result_button_text);
+              $("#woocommerce_toptex_api_submit_button").attr("disabled", false);
+              $("#woocommerce_toptex_api_submit_button").html(woocommerce_toptex_api_submit_button_text);
+
             });
           </script>
           ';

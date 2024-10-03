@@ -115,35 +115,29 @@ function importToptexProducts($attr) {
                 event.stopPropagation();
 
                 }else{
-
                     event.preventDefault();
+                    let woocommerce_toptex_api_submit_button_text = $("#woocommerce_toptex_api_submit_button").html();
                     $("#woocommerce_toptex_api_submit_button").attr("disabled", true);
-                    // $("input:submit").attr("disabled", true);
                     $("#woocommerce_toptex_api_submit_button").html("Importing...");
-                    // $("input:submit").val("Importing...");
                     $("#result").html("<h6>Please do not refresh or close this window while importing...</h6>");
                     $("#result h6").addClass("text-center text-danger");
                     let toptex_api_catalog_reference = $( "#woocommerce_toptex_api_catalog_reference_field" ).val();
                     let post_url = "' . WOOCOMMERCE_TOPTEX_API_PLUGIN_URL . 'inc/shortcodes/includes/post.php";
                     let current_url = $(location).attr("href");
-                    // alert(current_url);
 
-                    $.ajax({
-
-                        type: "POST",
-                        url: post_url,
-                        data: {toptex_api_catalog_reference, current_url}, 
-                        success: function(result){
-
-                            $("#result").html(result);
-                            $("#woocommerce_toptex_api_submit_button").attr("disabled", false);
-                            // $("input:submit").attr("disabled", false);
-                            $("#woocommerce_toptex_api_submit_button").html("'.$args['form_submit_button_text'].'");
-                            // $("input:submit").val("Save Settings");
-
-                        }
-
-                    });
+                    function importSingleProduct(toptex_api_catalog_reference, post_url, current_url){
+                        $.ajax({
+                            type: "POST",
+                            url: post_url,
+                            data: {toptex_api_catalog_reference, current_url}, 
+                            success: function(result){
+                                $("#result").html(result);
+                                $("#woocommerce_toptex_api_submit_button").attr("disabled", false);
+                                $("#woocommerce_toptex_api_submit_button").html(woocommerce_toptex_api_submit_button_text);
+                            }
+                        });
+                    }
+                    importSingleProduct(toptex_api_catalog_reference, post_url, current_url);
 
                 }
         
