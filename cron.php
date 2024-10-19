@@ -654,7 +654,7 @@ if( $toptex_cron_list ){
               if($toptex_total_images > $wc_total_images){
                 for($i = $wc_total_images; $i < $toptex_total_images; $i++){
                   try {
-                    $image_id = woocommerce_toptex_api_custom_image_file_upload( $toptex_all_image_src_array[$i]['src'], $toptex_all_image_src_array[$i]['name'] );
+                    $image_id = woocommerce_toptex_api_custom_image_file_upload( $toptex_all_image_src_array[$i]['src'], $toptex_all_image_src_array[$i]['name'], $wc_product_id );
                   }catch (PDOException $e) {
                     $resultHTML .= "Error: " . $e->getMessage();
                   }finally{

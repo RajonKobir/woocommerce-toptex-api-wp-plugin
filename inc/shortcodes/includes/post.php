@@ -282,8 +282,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // creating color, size, images array
         if(count($toptex_prod_variants) > 0){
           foreach($toptex_prod_variants as $key_variant => $single_variant){
-            // initializing
-            $variant_color = $single_variant["colors"][$toptex_api_language] . '-' . $single_variant["colorsDominant"][0][$toptex_api_language];
+              // initializing
+              if( count($single_variant["colorsDominant"]) > 0 ){
+                $variant_color = $single_variant["colors"][$toptex_api_language] . '-' . $single_variant["colorsDominant"][0][$toptex_api_language];
+              }else{
+                $variant_color = $single_variant["colors"][$toptex_api_language] . '-' . $single_variant["colorsHexa"][0];
+              }
 
               if( $single_variant["saleState"] == "active" ){
 
@@ -969,7 +973,7 @@ if($open_ai_api_key && $open_ai_api_key != ''){
               if($toptex_total_images > $wc_total_images){
                 for($i = $wc_total_images; $i < $toptex_total_images; $i++){
                   try {
-                    $image_id = woocommerce_toptex_api_custom_image_file_upload( $toptex_all_image_src_array[$i]['src'], $toptex_all_image_src_array[$i]['name'] );
+                    $image_id = woocommerce_toptex_api_custom_image_file_upload( $toptex_all_image_src_array[$i]['src'], $toptex_all_image_src_array[$i]['name'], $wc_product_id );
                   }catch (PDOException $e) {
 
                     $resultHTML .= "Error: " . $e->getMessage();
@@ -1077,31 +1081,6 @@ if($open_ai_api_key && $open_ai_api_key != ''){
 
             }else{
 
-              // initializing
-              $updated_images_array = [];
-              $missed_images_array = [];
-              
-              // adding images
-              foreach($toptex_all_image_src_array as $image_key => $single_toptex_image){
-                try {
-                  $image_id = woocommerce_toptex_api_custom_image_file_upload( $single_toptex_image['src'], $single_toptex_image['name'] );
-                }catch (PDOException $e) {
-
-                  $resultHTML .= "Error: " . $e->getMessage();
-
-                }finally{
-                  if(is_int($image_id)){
-                    array_push($updated_images_array,  [
-                      'id' => $image_id,
-                      'name' => $single_toptex_image['name'],
-                      'alt' => $single_toptex_image['alt'],
-                    ]);
-                  }else{
-                    array_push($missed_images_array, $image_key + 1);
-                  }
-                }
-              }
-
               // creating product data
               $data = [
                   'name' => $toptex_prod_name,
@@ -1117,7 +1096,7 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                           'id' => (isset($callBack5->id)) ? $callBack5->id : $key5,
                       ],
                   ],
-                  'images' => $updated_images_array,
+                  // 'images' => $updated_images_array,
                   'attributes'  => $attributes_array,
                   'tags'  => $tags_array,
                   'meta_data' =>  $product_meta_data_array
@@ -1186,6 +1165,85 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                   $resultHTML .= '<p class="text-center">Product ('.$toptex_prod_name.') could not be imported!</p>';
                 }
               // product not created ends here
+
+
+              try {
+
+                // retrieving the product
+                $wc_retrieved_product = $woocommerce->get('products/' . strval($wc_product_id));
+
+              }catch (PDOException $e) {
+
+                $resultHTML .= "Error: " . $e->getMessage();
+
+              }finally{
+                // initializing
+                $wc_total_images = count($wc_retrieved_product->images);
+                $toptex_total_images = count($toptex_all_image_src_array);
+                $missed_images_array = [];
+
+                if($wc_total_images == 0){
+                  $updated_images_array = [];
+                }else{
+                  $updated_images_array = $wc_retrieved_product->images;
+                }
+                
+                // adding images
+                if($toptex_total_images > $wc_total_images){
+                  for($i = $wc_total_images; $i < $toptex_total_images; $i++){
+                    try {
+                      $image_id = woocommerce_toptex_api_custom_image_file_upload( $toptex_all_image_src_array[$i]['src'], $toptex_all_image_src_array[$i]['name'], $wc_product_id );
+                    }catch (PDOException $e) {
+
+                      $resultHTML .= "Error: " . $e->getMessage();
+
+                    }finally{
+                      if(is_int($image_id)){
+                        array_push($updated_images_array,  [
+                          'id' => $image_id,
+                          'name' => $toptex_all_image_src_array[$i]['name'],
+                          'alt' => $toptex_all_image_src_array[$i]['alt'],
+                        ]);
+                      }else{
+                        array_push($missed_images_array, $i + 1);
+                      }
+                    }
+                  }
+                }
+
+                // creating product data
+                $data = [
+                  'images' => $updated_images_array
+                ];
+
+              }
+
+
+              try {
+
+                // trying to update a WC product
+                $update_wc_prod = $woocommerce->put('products/' . strval($wc_product_id), $data);
+
+              }catch (PDOException $e) {
+
+                $resultHTML .= "Error: " . $e->getMessage();
+
+              }finally{
+
+                // get the correct product id
+                $wc_product_id = $update_wc_prod->id;
+
+                $wc_retrieved_product = $update_wc_prod;
+
+                //create or update wp-option includes list of product sku for cron 
+                $product_id = $update_wc_prod->id;
+                $product_sku = $update_wc_prod->sku;
+
+                $resultHTML .= '<p class="text-center">Product ('.$product_id.') => ('.$product_sku.') => ('.$toptex_prod_name.') Images imported successfully!</p>';
+
+
+              }
+
 
             }
 
@@ -1261,7 +1319,11 @@ if($open_ai_api_key && $open_ai_api_key != ''){
                   }
 
                   // initializing
-                  $variant_color = $single_variant["colors"][$toptex_api_language] . '-' . $single_variant["colorsDominant"][0][$toptex_api_language];
+                  if( count($single_variant["colorsDominant"]) > 0 ){
+                    $variant_color = $single_variant["colors"][$toptex_api_language] . '-' . $single_variant["colorsDominant"][0][$toptex_api_language];
+                  }else{
+                    $variant_color = $single_variant["colors"][$toptex_api_language] . '-' . $single_variant["colorsHexa"][0];
+                  }
 
                   foreach($single_variant["sizes"] as $key_size => $single_size){
 
